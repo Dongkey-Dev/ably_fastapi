@@ -1,3 +1,11 @@
 fastapi
 uvicorn
 gunicorn
+sqlalchemy
+pydantic[email]
+
+pyjwt
+bcrypt
+pycrypto
+
+python-dotenv
