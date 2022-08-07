@@ -3,7 +3,7 @@
 
 ### dotenv ###
 .env
-
+*.ipynb
 ### macOS ###
 # General
 .DS_Store
