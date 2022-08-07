@@ -1,8 +1,11 @@
 import os
-from pydantic import root_validator, validator
+from uuid import uuid4
+from typing import Optional
+from datetime import datetime
+from pydantic import UUID4, root_validator, validator
 from pydantic.main import BaseModel
 from pydantic.networks import EmailStr
-from crypto.cipher import AESCipher
+from app.crypto.cipher import AESCipher
 
 CRYPTO_KEY = os.getenv("CRYPTO_KEY")
 
@@ -82,11 +85,17 @@ class UserInquireOut(BaseModel):
     phone : str
     
 class UsersAllOut(BaseModel):
+    id : UUID4
     email : EmailStr
     nickname : str    
     username : str
     phone : str
     pswd : str
+    created_at : Optional[datetime]
+    updated_at : Optional[datetime]
+    
+    class Config:
+        orm_mode = True
 
 class Token(BaseModel):
     Authorization: str = None

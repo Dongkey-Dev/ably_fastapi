@@ -3,7 +3,10 @@ from app.models import UserInquireOut, UsersAllOut
 from app.middleware.jwt_handler import get_user_token
 from app.utils.open_api_docs import auth_scheme
 
-from app.db.dbconn import db, Base
+from typing import List
+from app.db.dbconn import db
+from app.db.schema import Users
+from app.models import UsersAllOut
 from starlette.responses import JSONResponse
 from sqlalchemy.sql import text
 
@@ -13,7 +16,7 @@ router = APIRouter()
 async def read_users_me(user_info: UserInquireOut = Depends(get_user_token)):
     return user_info
 
-@router.get("/get_all_users")
+@router.get("/get_all_users", response_model=List[UsersAllOut])
 async def read_all_users_info():
     query = "select * from users"
     user_range = db.engine.execute(statement=query).yield_per(1)
@@ -29,4 +32,4 @@ async def read_all_users_info():
         user_map["created_at"] = user_info[6]
         user_map["updated_at"] = user_info[7]
         result.append(user_map)
-    return JSONResponse(status_code=200, content=dict(user_list=f"{result}"))
+    return result

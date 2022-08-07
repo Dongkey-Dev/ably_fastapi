@@ -12,3 +12,4 @@ pycrypto
 python-dotenv
 loguru
 pytest
+requests

@@ -1,9 +1,9 @@
-from common import consts
+from app.common import consts
 from fastapi import Depends, FastAPI
-from routes import auth, inquire
+from app.routes import auth, inquire
 
 from app.db.dbconn import db
-from utils.logger import logging_dependency
+from app.utils.logger import logging_dependency
 
 def create_app():
     app = FastAPI()
