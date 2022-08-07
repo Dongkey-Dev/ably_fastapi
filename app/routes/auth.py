@@ -14,7 +14,7 @@ from app.utils.open_api_docs import auth_scheme
 
 router = APIRouter()
   
-@router.post("/auth/verify_phone_to_regist", status_code=200, response_model=Token)
+@router.post("/auth/verify_phone_to_regist", status_code=202, response_model=Token)
 async def verify_phone_to_regist(phone_info : ValidPhoneIn):
     is_exist = await is_phone_exist(phone_info.phone)
     if not (phone_info.phone and phone_info.username):
@@ -42,7 +42,7 @@ async def regist_user(reg_info : UserRegistIn, session : Session = Depends(db.se
         nickname=reg_info.nickname, phone=reg_info.phone, username=reg_info.username)
     return MessageOut(msg=f"{reg_info.email} regist success.")
 
-@router.post("/auth/verify_phone_to_reset_pswd", status_code=200, response_model=Token)
+@router.post("/auth/verify_phone_to_reset_pswd", status_code=202, response_model=Token)
 async def verify_phone_to_reset_pswd(phone_info : ValidPhoneIn):
     user_to_reset = await is_phone_exist(phone_info.phone)
     if not (phone_info.phone and phone_info.username):
@@ -71,7 +71,7 @@ async def reset_pswd(reset_info: ResetPswdIn, phone_pswd_token: UserPhonePswdTok
     ret = Users.filter(email=reset_info.email).update(auto_commit=True, pswd=hashed_pswd.decode())
     return MessageOut(msg=f"{user_to_reset_pswd.email} password updated. {ret}")    
     
-@router.post("/auth/login_user", status_code=200, response_model=Token)
+@router.post("/auth/login_user", status_code=202, response_model=Token)
 async def login_to_get_token_which_can_call_api_me(log_info: UserLoginIn):
     is_exist = await is_email_exist(log_info.email)
     if not (log_info.email and log_info.pswd):
