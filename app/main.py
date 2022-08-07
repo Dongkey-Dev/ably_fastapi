@@ -1,3 +1,4 @@
+from common import consts
 from fastapi import Depends, FastAPI
 from routes import auth, inquire
 
