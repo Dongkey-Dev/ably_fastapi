@@ -34,7 +34,7 @@ async def regist_user(reg_info : UserRegistIn, session : Session = Depends(db.se
             reg_info.phone and reg_info.confirm_pswd):
         return JSONResponse(status_code=400, content=dict(msg="Some infomation is missing."))
     if reg_info.phone != token_data.phone:
-        return JSONResponse(status_code=400, content=dict(msg=f"{reg_info.phone}  {token_data}"))
+        return JSONResponse(status_code=400, content=dict(msg=f"The wrong phone number."))
     if is_exist:
         return JSONResponse(status_code=400, content=dict(msg="Email already exists."))
     hashed_pswd = bcrypt.hashpw(reg_info.pswd.encode("utf-8"), bcrypt.gensalt())
