@@ -14,7 +14,7 @@ def create_app():
     app = FastAPI()
 
     app.include_router(auth.router, tags=["Authentication"], prefix="/api", dependencies=[Depends(logging_dependency)])
-    app.include_router(inquire.router, tags=["Service"], prefix="/api", dependencies=[Depends(logging_dependency)])
+    app.include_router(inquire.router, tags=["Service"], prefix="/api/service", dependencies=[Depends(logging_dependency)])
     return app
 
 app = create_app()
