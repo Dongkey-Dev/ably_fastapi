@@ -3,6 +3,7 @@ uvicorn
 gunicorn
 sqlalchemy
 pydantic[email]
+psycopg2-binary
 
 pyjwt
 bcrypt
