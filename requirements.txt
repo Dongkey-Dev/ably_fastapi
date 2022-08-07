@@ -9,3 +9,4 @@ bcrypt
 pycrypto
 
 python-dotenv
+pytest
