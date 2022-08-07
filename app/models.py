@@ -80,6 +80,13 @@ class UserInquireOut(BaseModel):
     nickname : str    
     username : str
     phone : str
+    
+class UsersAllOut(BaseModel):
+    email : EmailStr
+    nickname : str    
+    username : str
+    phone : str
+    pswd : str
 
 class Token(BaseModel):
     Authorization: str = None
