@@ -5,7 +5,7 @@ from fastapi import Depends, FastAPI
 from app.db.dbconn import db
 from app.utils.logger import logging_dependency
 
-if 'ably_fastapi' not in [p for p in sys.path]:
+if 'ably_fastapi' not in [p.split('/')[-1] for p in sys.path]:
     from common import consts
 from app.common import consts
 from app.routes import auth, inquire
