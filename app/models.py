@@ -1,28 +1,29 @@
 import os
-from uuid import uuid4
-from typing import Optional
 from datetime import datetime
-from pydantic import UUID4, root_validator, validator
+from typing import Optional
+
+from pydantic import UUID4, root_validator
 from pydantic.main import BaseModel
 from pydantic.networks import EmailStr
-from app.crypto.cipher import AESCipher
 
 CRYPTO_KEY = os.getenv("CRYPTO_KEY")
 
+
 class UserRegistIn(BaseModel):
-    email : EmailStr
-    nickname : str
-    username : str
-    phone : str
-    pswd : str
-    confirm_pswd : str
-    
+    email: EmailStr
+    nickname: str
+    username: str
+    phone: str
+    pswd: str
+    confirm_pswd: str
+
     @root_validator
     def check_confirm_password(cls, values):
         password = values.get("pswd")
         confirm_password = values.get("confirm_pswd")
         if password != confirm_password:
-            raise ValueError("The password doesn't match with confirm_password")
+            raise ValueError(
+                "The password doesn't match with confirm_password")
         return values
     """
     If the client supports encryption...
@@ -37,67 +38,82 @@ class UserRegistIn(BaseModel):
             raise ValueError("Invalid encryption.")
         return dec
     """
-    
+
+
 class ResetPswdIn(BaseModel):
-    email : EmailStr
-    pswd : str
-    confirm_pswd : str    
-    
+    email: EmailStr
+    pswd: str
+    confirm_pswd: str
+
     @root_validator
     def check_confirm_password(cls, values):
         password = values.get("pswd")
         confirm_password = values.get("confirm_pswd")
         if password != confirm_password:
-            raise ValueError("The password doesn't match with confirm_password")
-        return values    
-    
+            raise ValueError(
+                "The password doesn't match with confirm_password")
+        return values
+
+
 class MessageOut(BaseModel):
-    msg : str    
-    
+    msg: str
+
+
 class ValidPhoneIn(BaseModel):
-    username : str
-    phone : str
-    
+    username: str
+    phone: str
+
+
 class UserPhoneToken(BaseModel):
     phone: str = None
-    class Config:
-        orm_mode = True   
-        
-class UserPhonePswdToken(BaseModel):
-    phone: str = None
-    doublehash_pswd: str = None
-    class Config:
-        orm_mode = True                
-    
-class UserToken(BaseModel):
-    email: EmailStr = None
-    class Config:
-        orm_mode = True    
-    
-class UserLoginIn(BaseModel):
-    email : EmailStr = None
-    pswd : str
-    
-class UserInquireOut(BaseModel):
-    email : EmailStr
-    nickname : str    
-    username : str
-    phone : str
-    
-class UsersAllOut(BaseModel):
-    id : UUID4
-    email : EmailStr
-    nickname : str    
-    username : str
-    phone : str
-    pswd : str
-    created_at : Optional[datetime]
-    updated_at : Optional[datetime]
-    
+
     class Config:
         orm_mode = True
 
+
+class UserPhonePswdToken(BaseModel):
+    phone: str = None
+    doublehash_pswd: str = None
+
+    class Config:
+        orm_mode = True
+
+
+class UserToken(BaseModel):
+    email: EmailStr = None
+
+    class Config:
+        orm_mode = True
+
+
+class UserLoginIn(BaseModel):
+    email: EmailStr = None
+    pswd: str
+
+
+class UserInquireOut(BaseModel):
+    email: EmailStr
+    nickname: str
+    username: str
+    phone: str
+
+
+class UsersAllOut(BaseModel):
+    id: UUID4
+    email: EmailStr
+    nickname: str
+    username: str
+    phone: str
+    pswd: str
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        orm_mode = True
+
+
 class Token(BaseModel):
     Authorization: str = None
+
     class Config:
-        orm_mode = True      
+        orm_mode = True

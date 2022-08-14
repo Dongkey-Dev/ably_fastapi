@@ -1,10 +1,12 @@
 import sys
-from loguru import logger
 
 from fastapi import Request
+from loguru import logger
 
 logger.remove()
-logger.add(sys.stdout, colorize=True, format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>")
+logger.add(sys.stdout, colorize=True,
+           format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>")
+
 
 async def logging_dependency(request: Request):
     logger.debug(f"{request.method} {request.url}")

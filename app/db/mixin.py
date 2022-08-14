@@ -1,18 +1,15 @@
 
-from sqlalchemy import (
-    Column,
-    Integer,
-    DateTime,
-    func,
-)
-
-from sqlalchemy.orm import Session, relationship
 from app.db.dbconn import db
+from sqlalchemy import Column, DateTime, func
+from sqlalchemy.orm import Session
+
 
 class BaseMixin:
-    created_at = Column(DateTime(timezone=True), nullable=False, default=func.now())
-    updated_at = Column(DateTime(timezone=True), nullable=False, default=func.now(), onupdate=func.now())    
-    
+    created_at = Column(DateTime(timezone=True),
+                        nullable=False, default=func.now())
+    updated_at = Column(DateTime(timezone=True), nullable=False,
+                        default=func.now(), onupdate=func.now())
+
     def __init__(self):
         self._q = None
         self._session = None
@@ -58,7 +55,8 @@ class BaseMixin:
             query = query.filter(col == val)
 
         if query.count() > 1:
-            raise Exception("Only one row is supposed to be returned, but got more than one.")
+            raise Exception(
+                "Only one row is supposed to be returned, but got more than one.")
         result = query.first()
         if not session:
             sess.close()
@@ -78,12 +76,18 @@ class BaseMixin:
             if len(key) > 2:
                 raise Exception("No 2 more dunders")
             col = getattr(cls, key[0])
-            if len(key) == 1: cond.append((col == val))
-            elif len(key) == 2 and key[1] == 'gt': cond.append((col > val))
-            elif len(key) == 2 and key[1] == 'gte': cond.append((col >= val))
-            elif len(key) == 2 and key[1] == 'lt': cond.append((col < val))
-            elif len(key) == 2 and key[1] == 'lte': cond.append((col <= val))
-            elif len(key) == 2 and key[1] == 'in': cond.append((col.in_(val)))
+            if len(key) == 1:
+                cond.append((col == val))
+            elif len(key) == 2 and key[1] == 'gt':
+                cond.append((col > val))
+            elif len(key) == 2 and key[1] == 'gte':
+                cond.append((col >= val))
+            elif len(key) == 2 and key[1] == 'lt':
+                cond.append((col < val))
+            elif len(key) == 2 and key[1] == 'lte':
+                cond.append((col <= val))
+            elif len(key) == 2 and key[1] == 'in':
+                cond.append((col.in_(val)))
         obj = cls()
         if session:
             obj._session = session
@@ -113,7 +117,8 @@ class BaseMixin:
                 col_name = a
                 is_asc = True
             col = self.cls_attr(col_name)
-            self._q = self._q.order_by(col.asc()) if is_asc else self._q.order_by(col.desc())
+            self._q = self._q.order_by(
+                col.asc()) if is_asc else self._q.order_by(col.desc())
         return self
 
     def update(self, auto_commit: bool = False, **kwargs):
@@ -122,7 +127,7 @@ class BaseMixin:
         ret = None
 
         self._session.flush()
-        if qs > 0 :
+        if qs > 0:
             ret = self._q.first()
         if auto_commit:
             self._session.commit()

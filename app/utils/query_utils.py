@@ -1,5 +1,6 @@
 from typing import List
 
+
 def to_dict(model, *args, exclude: List = None):
     q_dict = {}
     for c in model.__table__.columns:

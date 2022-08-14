@@ -1,20 +1,18 @@
-from fastapi import APIRouter, Depends
-from app.models import UserInquireOut, UsersAllOut
-from app.middleware.jwt_handler import get_user_token
-from app.utils.open_api_docs import auth_scheme
-
 from typing import List
+
 from app.db.dbconn import db
-from app.db.schema import Users
-from app.models import UsersAllOut
-from starlette.responses import JSONResponse
-from sqlalchemy.sql import text
+from app.middleware.jwt_handler import get_user_token
+from app.models import UserInquireOut, UsersAllOut
+from app.utils.open_api_docs import auth_scheme
+from fastapi import APIRouter, Depends
 
 router = APIRouter()
+
 
 @router.get("/me", response_model=UserInquireOut, dependencies=[Depends(auth_scheme)])
 async def read_users_me(user_info: UserInquireOut = Depends(get_user_token)):
     return user_info
+
 
 @router.get("/get_all_users", response_model=List[UsersAllOut])
 async def read_all_users_info_no_need_token():

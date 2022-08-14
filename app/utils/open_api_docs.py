@@ -1,6 +1,7 @@
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
 
+
 class OptionalHTTPBearer(HTTPBearer):
     async def __call__(self, request: Request):
         from fastapi import status
@@ -12,4 +13,5 @@ class OptionalHTTPBearer(HTTPBearer):
             token = None
         return token
 
-auth_scheme = OptionalHTTPBearer()    
+
+auth_scheme = OptionalHTTPBearer()
