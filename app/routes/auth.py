@@ -32,7 +32,7 @@ async def verify_phone_to_regist(phone_info: ValidPhoneIn):
     return token
 
 
-@router.post("/auth/regist_user", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
+@router.post("/auth/user", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
 async def regist_user(reg_info: UserRegistIn, session: Session = Depends(db.session), token_data: UserPhoneToken = Depends(get_phone_token)):
     is_exist = await is_email_exist(reg_info.email)
     if not (reg_info.email and reg_info.pswd and
@@ -67,7 +67,7 @@ async def verify_phone_to_reset_pswd(phone_info: ValidPhoneIn):
     return token
 
 
-@router.post("/auth/reset_pswd", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
+@router.patch("/auth/user_pswd", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
 async def reset_pswd(reset_info: ResetPswdIn, phone_pswd_token: UserPhonePswdToken = Depends(get_phone_hashpswd_token)):
     user_to_reset_pswd = await is_email_exist(reset_info.email)
     doublehash_pswd = await get_hash_pswd(user_to_reset_pswd.pswd)

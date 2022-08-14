@@ -14,7 +14,7 @@ async def read_users_me(user_info: UserInquireOut = Depends(get_user_token)):
     return user_info
 
 
-@router.get("/get_all_users", response_model=List[UsersAllOut])
+@router.get("/users", response_model=List[UsersAllOut])
 async def read_all_users_info_no_need_token():
     query = "select * from users"
     user_range = db.engine.execute(statement=query).yield_per(1)
