@@ -1,6 +1,7 @@
 
-from app.db.dbconn import db
+from app.db.dbconn import async_session
 from sqlalchemy import Column, DateTime, func
+from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
 
@@ -10,66 +11,36 @@ class BaseMixin:
     updated_at = Column(DateTime(timezone=True), nullable=False,
                         default=func.now(), onupdate=func.now())
 
-    def __init__(self):
-        self._q = None
-        self._session = None
-        self.served = None
-
-    def all_columns(self):
-        return [c for c in self.__table__.columns if c.primary_key is False and c.name != "created_at"]
-
-    def __hash__(self):
-        return hash(self.id)
+    def __init__(self, db_session: Session):
+        self.db_session = db_session
 
     @classmethod
-    def create(cls, session: Session, auto_commit=False, **kwargs):
-        """
-        :param session:
-        :param auto_commit: 자동 커밋 여부
-        :param kwargs: 적재 할 데이터
-        :return:
-        """
-        obj = cls()
-        for col in obj.all_columns():
-            col_name = col.name
-            if col_name in kwargs:
-                setattr(obj, col_name, kwargs.get(col_name))
-        session.add(obj)
-        session.flush()
-        if auto_commit:
-            session.commit()
-        return obj
+    async def create(cls, **kwargs):
+        new_obj = cls(**kwargs)
+        async with async_session() as session:
+            async with session.begin():
+                session.add(new_obj)
+                await session.flush()
 
     @classmethod
-    def get(cls, session: Session = None, **kwargs):
-        """
-        Simply get a Row
-        :param session:
-        :param kwargs:
-        :return:
-        """
-        sess = next(db.session()) if not session else session
-        query = sess.query(cls)
-        for key, val in kwargs.items():
-            col = getattr(cls, key)
-            query = query.filter(col == val)
-
-        if query.count() > 1:
-            raise Exception(
-                "Only one row is supposed to be returned, but got more than one.")
-        result = query.first()
-        if not session:
-            sess.close()
-        return result
+    async def get_all_obj(cls):
+        async with async_session() as session:
+            async with session.begin():
+                q = await session.execute(select(cls))
+            return q.scalars().all()
 
     @classmethod
-    def filter(cls, session: Session = None, **kwargs):
-        """
-        Simply get a Row
-        :param session:
-        :param kwargs:
-        :return:
-        """
+    async def get(cls, **kwargs):
+        q = filter(cls, kwargs)
+        # raise Exception(q)
+        async with async_session() as session:
+            async with session.begin():
+                res = session.execute(q)
+                raise Exception(res)
+                return session.execute(q)
+
+    @classmethod
+    async def filter(cls, **kwargs):
         cond = []
         for key, val in kwargs.items():
             key = key.split("__")
@@ -88,74 +59,9 @@ class BaseMixin:
                 cond.append((col <= val))
             elif len(key) == 2 and key[1] == 'in':
                 cond.append((col.in_(val)))
-        obj = cls()
-        if session:
-            obj._session = session
-            obj.served = True
-        else:
-            obj._session = next(db.session())
-            obj.served = False
-        query = obj._session.query(cls)
-        query = query.filter(*cond)
-        obj._q = query
-        return obj
+        return await select(cls).where(*cond)
 
-    @classmethod
-    def cls_attr(cls, col_name=None):
-        if col_name:
-            col = getattr(cls, col_name)
-            return col
-        else:
-            return cls
-
-    def order_by(self, *args: str):
-        for a in args:
-            if a.startswith("-"):
-                col_name = a[1:]
-                is_asc = False
-            else:
-                col_name = a
-                is_asc = True
-            col = self.cls_attr(col_name)
-            self._q = self._q.order_by(
-                col.asc()) if is_asc else self._q.order_by(col.desc())
-        return self
-
-    def update(self, auto_commit: bool = False, **kwargs):
-        qs = self._q.update(kwargs)
-        get_id = self.id
-        ret = None
-
-        self._session.flush()
-        if qs > 0:
-            ret = self._q.first()
-        if auto_commit:
-            self._session.commit()
-        return ret
-
-    def first(self):
-        result = self._q.first()
-        self.close()
-        return result
-
-    def delete(self, auto_commit: bool = False):
-        self._q.delete()
-        if auto_commit:
-            self._session.commit()
-
-    def all(self):
-        print(self.served)
-        result = self._q.all()
-        self.close()
-        return result
-
-    def count(self):
-        result = self._q.count()
-        self.close()
-        return result
-
-    def close(self):
-        if not self.served:
-            self._session.close()
-        else:
-            self._session.flush()
+    # async def update(cls, self, **kwargs):
+    # q = update(cls).where(**kwargs)
+    # q.execution_options(synchronize_session="fetch")
+    # await self.db_session.execute(q)

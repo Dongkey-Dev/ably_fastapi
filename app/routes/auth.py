@@ -3,7 +3,7 @@ import hashlib
 import bcrypt
 from app.common.consts import (JWT_LOGIN_DELTA_TIME_MINUTE,
                                JWT_REGIST_DELTA_TIME_MINUTE)
-from app.db.dbconn import db
+from app.db.dbconn import get_db_session
 from app.db.schema import Users
 from app.middleware.jwt_handler import (create_access_token,
                                         get_phone_hashpswd_token,
@@ -13,40 +13,41 @@ from app.models import (MessageOut, ResetPswdIn, Token, UserLoginIn,
                         UserToken, ValidPhoneIn)
 from app.utils.open_api_docs import auth_scheme
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import JSONResponse
 
 router = APIRouter()
 
 
 @router.post("/auth/verify_phone_to_regist", status_code=202, response_model=Token)
-async def verify_phone_to_regist(phone_info: ValidPhoneIn):
-    is_exist = await is_phone_exist(phone_info.phone)
+async def verify_phone_to_regist(phone_info: ValidPhoneIn, session: AsyncSession = Depends(get_db_session)):
+    is_exist = await is_phone_exist(session, phone_info.phone)
     if not (phone_info.phone and phone_info.username):
         return JSONResponse(status_code=400, content=dict(msg="Some infomation is missing."))
     if is_exist:
         return JSONResponse(status_code=400, content=dict(msg="Already registered phone number."))
+    data = UserPhoneToken.from_orm(phone_info).dict()
     token = dict(
-        Authorization=f"Bearer {create_access_token(data=UserPhoneToken.from_orm(phone_info).dict(), expires_delta=JWT_REGIST_DELTA_TIME_MINUTE)}"
+        Authorization=f"Bearer {create_access_token(data=data, expires_delta=JWT_REGIST_DELTA_TIME_MINUTE)}"
     )
     return token
 
 
 @router.post("/auth/user", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
-async def regist_user(reg_info: UserRegistIn, session: Session = Depends(db.session), token_data: UserPhoneToken = Depends(get_phone_token)):
-    is_exist = await is_email_exist(reg_info.email)
+async def regist_user(reg_info: UserRegistIn, session: AsyncSession = Depends(get_db_session), token_data: UserPhoneToken = Depends(get_phone_token)):
+    is_exist = await is_email_exist(session, reg_info.email)
     if not (reg_info.email and reg_info.pswd and
             reg_info.nickname and reg_info.username and
             reg_info.phone and reg_info.confirm_pswd):
         return JSONResponse(status_code=400, content=dict(msg="Some infomation is missing."))
     if reg_info.phone != token_data.phone:
-        return JSONResponse(status_code=400, content=dict(msg=f"The wrong phone number."))
+        return JSONResponse(status_code=400, content=dict(msg="The wrong phone number."))
     if is_exist:
         return JSONResponse(status_code=400, content=dict(msg="Email already exists."))
     hashed_pswd = bcrypt.hashpw(
         reg_info.pswd.encode("utf-8"), bcrypt.gensalt())
-    Users.create(session, auto_commit=True, email=reg_info.email, pswd=hashed_pswd.decode(),
-                 nickname=reg_info.nickname, phone=reg_info.phone, username=reg_info.username)
+    inserted_user = await create_user(session, email=reg_info.email, pswd=hashed_pswd.decode(),
+                                      nickname=reg_info.nickname, phone=reg_info.phone, username=reg_info.username)
     return MessageOut(msg=f"{reg_info.email} regist success.")
 
 
@@ -102,21 +103,29 @@ async def login_to_get_token_which_can_call_api_me(log_info: UserLoginIn):
     return token
 
 
+async def create_user(session: AsyncSession, **kwargs):
+    q = Users.insert().values(**kwargs)
+    inserted_id = await session.execute(q)
+    return inserted_id
+
+
 async def get_hash_pswd(pswd: str):
     double_hash_object = hashlib.sha256()
     double_hash_object.update(pswd.encode("utf-8"))
     return double_hash_object.hexdigest()
 
 
-async def is_email_exist(email: str):
-    get_email = Users.get(email=email)
-    if get_email:
+async def is_email_exist(session: AsyncSession, email: str):
+    q = Users.select().where(Users.c.email == email)
+    get_email = await session.execute(q)
+    if get_email.one_or_none():
         return get_email
     return False
 
 
-async def is_phone_exist(phone: str):
-    get_phone = Users.get(phone=phone)
-    if get_phone:
+async def is_phone_exist(session: AsyncSession, phone: str):
+    q = Users.select().where(Users.c.phone == phone)
+    get_phone = await session.execute(q)
+    if get_phone.one_or_none():
         return get_phone
     return False

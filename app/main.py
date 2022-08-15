@@ -7,15 +7,19 @@ if 'ably_fastapi' not in [p.split('/')[-1] for p in sys.path]:
     from common import consts
 
 from app.common import consts
-from app.db.dbconn import db
+from app.db.dbconn import Base, engine
 from app.routes import auth, inquire
 from app.utils.logger import logging_dependency
 
 
 def create_app():
     app = FastAPI()
-    db.init_app(app)
-    app = FastAPI()
+
+    @app.on_event("startup")
+    async def startup():
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+            await conn.run_sync(Base.metadata.create_all)
 
     app.include_router(auth.router, tags=[
                        "Authentication"], prefix="/api", dependencies=[Depends(logging_dependency)])
