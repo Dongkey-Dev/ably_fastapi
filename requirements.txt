@@ -2,8 +2,11 @@ fastapi
 uvicorn
 gunicorn
 sqlalchemy
+sqlalchemy_database
+sqlmodel
 pydantic[email]
 asyncpg
+greenlet
 
 pyjwt
 bcrypt
@@ -12,4 +15,6 @@ pycrypto
 python-dotenv
 loguru
 pytest
+pytest-asyncio
+httpx
 requests

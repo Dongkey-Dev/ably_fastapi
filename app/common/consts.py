@@ -1,9 +1,11 @@
 import os
 import sys
+
 from dotenv import load_dotenv
 
 sys.path.insert(0, os.path.dirname(os.getcwd()))
 load_dotenv(verbose=True)
+
 
 def get_db_env():
     return \
@@ -12,6 +14,7 @@ def get_db_env():
         os.getenv("DB_HOST"),\
         os.getenv("DB_PORT"),\
         os.getenv("DB_DATABASE")
+
 
 JWT_SECRET = os.getenv("JWT_SECRET")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")

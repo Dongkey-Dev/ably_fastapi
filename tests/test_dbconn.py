@@ -16,19 +16,3 @@ def test_get_users(test_app: TestClient, test_db_session: Session):
 
     response = test_app.get('/api/get_all_users')
     assert response.status_code == 200
-
-
-# def test_register_user(test_app: TestClient, test_db_session: Session):
-#     memo = {
-#         "title": "Memo 4",
-#         "content": "This content memo 4",
-#         "description": "This content memo 4 description",
-#         "is_favorite": False
-#     }
-
-#     response = test_app.post('/v1/memos', json=memo)
-#     assert len(response.content) == 2
-
-#     item = test_db_session.query(Memo).filter_by(title=memo['title']).first()
-#     assert item is not None
-#     assert item.content == memo['content']

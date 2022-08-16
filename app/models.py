@@ -10,6 +10,16 @@ from pydantic.networks import EmailStr
 CRYPTO_KEY = os.getenv("CRYPTO_KEY")
 
 
+class User(BaseModel):
+    email: EmailStr
+    nickname: str
+    username: str
+    phone: str
+    pswd: str
+    created_at: str
+    updated_at: str
+
+
 class UserRegistIn(BaseModel):
     email: EmailStr
     nickname: str
