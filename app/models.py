@@ -1,4 +1,5 @@
 import os
+import re
 from datetime import datetime
 from typing import Optional
 
@@ -25,6 +26,7 @@ class UserRegistIn(BaseModel):
             raise ValueError(
                 "The password doesn't match with confirm_password")
         return values
+
     """
     If the client supports encryption...
     
@@ -63,16 +65,24 @@ class ValidPhoneIn(BaseModel):
     username: str
     phone: str
 
+    @root_validator
+    def check_phone_number(cls, values):
+        phone = values.get("phone")
+        if not bool(re.search("[0-1]{2}\d{8,9}", phone)):
+            raise ValueError(
+                "Wrong phone number")
+        return values
+
 
 class UserPhoneToken(BaseModel):
-    phone: str = None
+    phone: str
 
     class Config:
         orm_mode = True
 
 
 class UserPhonePswdToken(BaseModel):
-    phone: str = None
+    phone: str
     doublehash_pswd: str = None
 
     class Config:
