@@ -4,6 +4,7 @@ from typing import Union
 
 import bcrypt
 import pytest
+import pytest_asyncio
 from app.db.schema import Base, Users
 from app.main import app
 from httpx import AsyncClient
@@ -26,7 +27,7 @@ class UserClient:
         self.user: Users = user
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def async_app_client() -> AsyncClient:
     async with AsyncClient(app=app, base_url="http://localhost:8081") as client:
         yield client
