@@ -1,3 +1,4 @@
+import asyncio
 import random
 from string import ascii_letters, digits
 
@@ -17,6 +18,13 @@ class UserClient:
         self.user: Users = user
 
 
+@pytest.fixture(scope="module")
+def event_loop():
+    loop = asyncio.get_event_loop()
+    yield loop
+    loop.close()
+
+
 @pytest.fixture
 def user_class() -> Users:
     return Users
@@ -31,7 +39,7 @@ def engine():
     engine.sync_engine.dispose()
 
 
-@pytest_asyncio.fixture()
+@pytest_asyncio.fixture
 async def create(engine):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -64,7 +72,7 @@ def get_random_pswd() -> str:
 
 @pytest.fixture
 def user_1(get_random_pswd) -> Users:
-    user = Users(email='testuser@gmail.com', nickname='testuser', username='testname', phone='01000000000',
+    user = Users(email='testuser_1@gmail.com', nickname='testuser', username='testname', phone='01000000000',
                  pswd=get_random_pswd)
     return user
 
