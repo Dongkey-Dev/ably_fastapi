@@ -3,7 +3,7 @@ import sys
 import uvicorn
 from fastapi import Depends, FastAPI
 
-if 'fastapi_user' not in [p.split('/')[-1] for p in sys.path]:
+if 'fastapi_users' not in [p.split('/')[-1] for p in sys.path]:
     from common import consts
 
 from app.common import consts
@@ -24,7 +24,7 @@ def create_app(test_config=None):
             await conn.run_sync(Base.metadata.drop_all)
             await conn.run_sync(Base.metadata.create_all)
 
-    @app.get("/")
+    @app.get("/", tags=["ping"])
     async def root():
         return {"status": True}
 
