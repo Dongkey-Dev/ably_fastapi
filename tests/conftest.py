@@ -6,7 +6,7 @@ import bcrypt
 import pytest
 import pytest_asyncio
 from app.db.schema import Base, Users
-from app.main import app
+from app.main import create_app
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from starlette.testclient import TestClient
@@ -14,11 +14,12 @@ from starlette.testclient import TestClient
 
 class UserClient:
     def __init__(self, client: TestClient = None, user: Users = None) -> None:
-        self.client: TestClient = client or TestClient(app)
+        self.client: TestClient = client or TestClient(
+            create_app(test_config=True))
         self.user: Users = user
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def event_loop():
     loop = asyncio.get_event_loop()
     yield loop
@@ -31,12 +32,15 @@ def user_class() -> Users:
 
 
 @pytest_asyncio.fixture(scope="session")
-def engine():
+async def engine():
     engine = create_async_engine(
-        "postgresql+asyncpg://"
+        "postgresql+asyncpg://",
+        echo=True,
+        pool_recycle=900,
+        pool_pre_ping=True
     )
     yield engine
-    engine.sync_engine.dispose()
+    await engine.dispose()
 
 
 @pytest_asyncio.fixture
@@ -56,7 +60,7 @@ async def session(engine, create):
 
 @pytest_asyncio.fixture
 async def async_app_client() -> AsyncClient:
-    async with AsyncClient(app=app, base_url="http://localhost:8081") as client:
+    async with AsyncClient(app=create_app(test_config=True), base_url="http://localhost:8081") as client:
         yield client
 
 
@@ -72,13 +76,13 @@ def get_random_pswd() -> str:
 
 @pytest.fixture
 def user_1(get_random_pswd) -> Users:
-    user = Users(email='testuser_1@gmail.com', nickname='testuser', username='testname', phone='01000000000',
-                 pswd=get_random_pswd)
-    return user
+    user_1 = Users(email='testuser_1@gmail.com', nickname='testuser', username='testname', phone='01000000000',
+                   pswd=get_random_pswd)
+    return user_1
 
 
 @pytest.fixture
 def user_2(get_random_pswd) -> Users:
-    user = Users(email='testuser2@gmail.com', nickname='testuser2', username='testname2', phone='01000000001',
-                 pswd=get_random_pswd)
-    return user
+    user_2 = Users(email='testuser2@gmail.com', nickname='testuser2', username='testname2', phone='01000000001',
+                   pswd=get_random_pswd)
+    return user_2

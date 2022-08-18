@@ -2,9 +2,8 @@ import bcrypt
 from app.common.consts import (JWT_LOGIN_DELTA_TIME_MINUTE,
                                JWT_REGIST_DELTA_TIME_MINUTE)
 from app.db.dbconn import get_db_session
-from app.middleware.jwt_handler import (create_access_token,
-                                        get_phone_hashpswd_token,
-                                        get_phone_token)
+from app.jwt.jwt_handler import (create_access_token, get_phone_hashpswd_token,
+                                 get_phone_token)
 from app.models import (MessageOut, ResetPswdIn, Token, UserLoginIn,
                         UserPhonePswdToken, UserPhoneToken, UserRegistIn,
                         UserToken, ValidPhoneIn)
