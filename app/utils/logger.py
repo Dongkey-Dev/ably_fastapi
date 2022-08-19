@@ -1,18 +1,20 @@
+import logging
 import sys
 
 from fastapi import Request
-from loguru import logger
+from loguru import logger as LG
 
-logger.remove()
-logger.add(sys.stdout, colorize=True,
+logger = logging.getLogger('test')
+LG.remove()
+LG.add(sys.stdout, colorize=True,
            format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>")
 
 
 async def logging_dependency(request: Request):
-    logger.debug(f"{request.method} {request.url}")
-    logger.debug("Params:")
+    LG.debug(f"{request.method} {request.url}")
+    LG.debug("Params:")
     for name, value in request.path_params.items():
-        logger.debug(f"\t{name}: {value}")
-    logger.debug("Headers:")
+        LG.debug(f"\t{name}: {value}")
+    LG.debug("Headers:")
     for name, value in request.headers.items():
-        logger.debug(f"\t{name}: {value}")
+        LG.debug(f"\t{name}: {value}")

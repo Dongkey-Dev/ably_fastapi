@@ -3,26 +3,20 @@ import sys
 import uvicorn
 from fastapi import Depends, FastAPI
 
+from app.utils.logger import logging
+
 if 'fastapi_users' not in [p.split('/')[-1] for p in sys.path]:
     from common import consts
 
 from app.common import consts
-from app.db.dbconn import Base, engine
+from app.db.dbconn import db
 from app.routes import auth, inquire
 from app.utils.logger import logging_dependency
 
 
-def create_app(test_config=None):
+def create_app(env='dev'):
     app = FastAPI()
-
-    if test_config:
-        app.config.update(test_config)
-
-    @app.on_event("startup")
-    async def startup():
-        async with engine.begin() as conn:
-            await conn.run_sync(Base.metadata.drop_all)
-            await conn.run_sync(Base.metadata.create_all)
+    db.init_app(app, env)
 
     @app.get("/", tags=["ping"])
     async def root():

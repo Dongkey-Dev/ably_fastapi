@@ -1,7 +1,7 @@
 import bcrypt
 from app.common.consts import (JWT_LOGIN_DELTA_TIME_MINUTE,
                                JWT_REGIST_DELTA_TIME_MINUTE)
-from app.db.dbconn import get_db_session
+from app.db.dbconn import db
 from app.jwt.jwt_handler import (create_access_token, get_phone_hashpswd_token,
                                  get_phone_token)
 from app.models import (MessageOut, ResetPswdIn, Token, UserLoginIn,
@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.post("/auth/verify_phone_to_regist", status_code=202, response_model=Token)
-async def verify_phone_to_regist(phone_info: ValidPhoneIn, session: AsyncSession = Depends(get_db_session)):
+async def verify_phone_to_regist(phone_info: ValidPhoneIn, session: AsyncSession = Depends(db.get_db_session)):
     is_exist = await qu.is_phone_exist(session, phone_info.phone)
     if is_exist:
         return JSONResponse(status_code=400, content=dict(msg="Already registered phone number."))
@@ -29,7 +29,7 @@ async def verify_phone_to_regist(phone_info: ValidPhoneIn, session: AsyncSession
 
 
 @router.post("/auth/user", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
-async def regist_user(reg_info: UserRegistIn, session=Depends(get_db_session), token_data=Depends(get_phone_token)):
+async def regist_user(reg_info: UserRegistIn, session=Depends(db.get_db_session), token_data=Depends(get_phone_token)):
     is_exist = await qu.is_email_exist(session, reg_info.email)
     if reg_info.phone != token_data.phone:
         return JSONResponse(status_code=400, content=dict(msg="The wrong phone number."))
@@ -44,7 +44,7 @@ async def regist_user(reg_info: UserRegistIn, session=Depends(get_db_session), t
 
 
 @router.post("/auth/verify_phone_to_reset_pswd", status_code=202, response_model=Token)
-async def verify_phone_to_reset_pswd(phone_info: ValidPhoneIn, session=Depends(get_db_session)):
+async def verify_phone_to_reset_pswd(phone_info: ValidPhoneIn, session=Depends(db.get_db_session)):
     user_to_reset = await qu.is_phone_exist(session, phone_info.phone)
     if not user_to_reset:
         return JSONResponse(status_code=400, content=dict(msg="There is no match user"))
@@ -60,7 +60,7 @@ async def verify_phone_to_reset_pswd(phone_info: ValidPhoneIn, session=Depends(g
 
 
 @router.put("/auth/user", status_code=201, response_model=MessageOut, dependencies=[Depends(auth_scheme)])
-async def reset_pswd(reset_info: ResetPswdIn, phone_pswd_token=Depends(get_phone_hashpswd_token), session=Depends(get_db_session)):
+async def reset_pswd(reset_info: ResetPswdIn, phone_pswd_token=Depends(get_phone_hashpswd_token), session=Depends(db.get_db_session)):
     user_to_reset_pswd = await qu.is_email_exist(session, reset_info.email)
     doublehash_pswd = await qu.get_hash_pswd(user_to_reset_pswd.pswd)
     if not user_to_reset_pswd:
@@ -76,11 +76,11 @@ async def reset_pswd(reset_info: ResetPswdIn, phone_pswd_token=Depends(get_phone
 
 
 @router.post("/auth/login_user", status_code=202, response_model=Token)
-async def login_to_get_token_which_can_call_api_me(log_info: UserLoginIn, session=Depends(get_db_session)):
-    is_exist = await qu.is_email_exist(log_info.email)
+async def login_to_get_token_which_can_call_api_me(log_info: UserLoginIn, session=Depends(db.get_db_session)):
+    is_exist = await qu.is_email_exist(session, log_info.email)
     if not is_exist:
         return JSONResponse(status_code=400, content=dict(msg="There is no match user"))
-    user_to_log = qu.login_user(session, email=log_info.email)
+    user_to_log = await qu.is_email_exist(session, email=log_info.email)
     is_verified = bcrypt.checkpw(log_info.pswd.encode(
         "utf-8"), user_to_log.pswd.encode("utf-8"))
     if not is_verified:

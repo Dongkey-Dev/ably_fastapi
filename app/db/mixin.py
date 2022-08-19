@@ -1,5 +1,4 @@
-
-from app.db.dbconn import async_session
+from app.db.dbconn import db
 from sqlalchemy import Column, DateTime, func
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
@@ -17,14 +16,14 @@ class BaseMixin:
     @classmethod
     async def create(cls, **kwargs):
         new_obj = cls(**kwargs)
-        async with async_session() as session:
+        async with db.session() as session:
             async with session.begin():
                 session.add(new_obj)
                 await session.flush()
 
     @classmethod
     async def get_all_obj(cls):
-        async with async_session() as session:
+        async with db.session() as session:
             async with session.begin():
                 q = await session.execute(select(cls))
             return q.scalars().all()
@@ -32,8 +31,7 @@ class BaseMixin:
     @classmethod
     async def get(cls, **kwargs):
         q = filter(cls, kwargs)
-        # raise Exception(q)
-        async with async_session() as session:
+        async with db.session() as session:
             async with session.begin():
                 res = session.execute(q)
                 raise Exception(res)

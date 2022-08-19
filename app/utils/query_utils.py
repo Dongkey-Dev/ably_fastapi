@@ -41,9 +41,3 @@ async def is_phone_exist(session: AsyncSession, phone: str):
 async def update_user(session: AsyncSession, email, **kwargs):
     q = UsersTable.update().where(UsersTable.c.email == email).values(**kwargs)
     await session.execute(q)
-
-
-async def login_user(session: AsyncSession, **kwargs):
-    q = UsersTable.select().where(**kwargs)
-    get_user = await session.execute(q)
-    return get_user.one_or_none()

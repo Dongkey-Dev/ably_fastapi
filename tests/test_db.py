@@ -1,9 +1,5 @@
-import logging
-
 import pytest
 import sqlalchemy as sa
-
-logger = logging.getLogger('test')
 
 
 @pytest.mark.asyncio

@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import random
 from string import ascii_letters, digits
 
@@ -12,10 +13,20 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from starlette.testclient import TestClient
 
 
+@pytest.fixture
+def ENV() -> str:
+    return 'test'
+
+
+@pytest.fixture
+def logger():
+    return logging.getLogger('test')
+
+
 class UserClient:
     def __init__(self, client: TestClient = None, user: Users = None) -> None:
-        self.client: TestClient = client or TestClient(
-            create_app(test_config=True))
+        self.client: TestClient = TestClient(
+            create_app(env=ENV))
         self.user: Users = user
 
 
@@ -59,8 +70,8 @@ async def session(engine, create):
 
 
 @pytest_asyncio.fixture
-async def async_app_client() -> AsyncClient:
-    async with AsyncClient(app=create_app(test_config=True), base_url="http://localhost:8081") as client:
+async def async_app_client(ENV) -> AsyncClient:
+    async with AsyncClient(app=create_app(env=ENV), base_url="http://localhost:8081") as client:
         yield client
 
 
