@@ -115,3 +115,18 @@ def post_body_regist_user_1(user_1):
     body = to_dict(user_1)
     body['confirm_pswd'] = user_1.pswd
     return body
+
+
+@pytest.fixture
+def post_body_verify_phone_to_reset_user_1():
+    body = {
+        "username": "testname",
+        "phone": "01000000000"
+    }
+    return body
+
+
+@pytest.fixture
+def post_body_login_user_1(user_1):
+    body = to_dict(user_1)
+    return body
