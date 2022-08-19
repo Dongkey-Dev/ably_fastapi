@@ -75,7 +75,7 @@ async def reset_pswd(reset_info: ResetPswdIn, phone_pswd_token=Depends(get_phone
     return MessageOut(msg=f"{user_to_reset_pswd.email} password updated.")
 
 
-@router.post("/auth/login_user", status_code=202, response_model=Token)
+@router.post("/auth/login", status_code=202, response_model=Token)
 async def login_to_get_token_which_can_call_api_me(log_info: UserLoginIn, session=Depends(db.get_db_session)):
     is_exist = await qu.is_email_exist(session, log_info.email)
     if not is_exist:
