@@ -1,12 +1,13 @@
 from datetime import datetime, timedelta
 
-import jwt
 from app.common.consts import JWT_ALGORITHM, JWT_SECRET
 from app.db.schema import Users
 from app.models import (UserInquireOut, UserPhonePswdToken, UserPhoneToken,
                         UserToken)
 from app.utils.query_utils import to_dict
 from fastapi import Depends, HTTPException, Request, status
+
+import jwt
 
 
 def getHTTPException(msg):
@@ -33,7 +34,7 @@ async def jwt_call(request: Request):
     return authorization
 
 
-async def decode_jwt(token: str):
+async def jwt_decode(token: str):
     token_data = token.replace('Bearer', '').strip()
     payload = jwt.decode(token_data, JWT_SECRET, algorithms=[JWT_ALGORITHM])
     return payload
