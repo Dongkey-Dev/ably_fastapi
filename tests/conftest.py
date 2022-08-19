@@ -8,6 +8,7 @@ import pytest
 import pytest_asyncio
 from app.db.schema import Base, Users
 from app.main import create_app
+from app.utils.query_utils import to_dict
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from starlette.testclient import TestClient
@@ -101,9 +102,16 @@ def user_2(get_random_pswd) -> Users:
 
 
 @pytest.fixture
-def post_body_verify_phone_to_regist_user():
+def post_body_verify_phone_to_regist_user_1():
     body = {
-        "username": "test_user_name",
-        "phone": "01011112222"
+        "username": "testname",
+        "phone": "01000000000"
     }
+    return body
+
+
+@pytest.fixture
+def post_body_regist_user_1(user_1):
+    body = to_dict(user_1)
+    body['confirm_pswd'] = user_1.pswd
     return body
