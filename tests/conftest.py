@@ -72,6 +72,7 @@ async def session(engine, create):
 @pytest_asyncio.fixture
 async def async_app_client(ENV) -> AsyncClient:
     async with AsyncClient(app=create_app(env=ENV), base_url="http://localhost:8081") as client:
+
         yield client
 
 
@@ -97,3 +98,12 @@ def user_2(get_random_pswd) -> Users:
     user_2 = Users(email='testuser2@gmail.com', nickname='testuser2', username='testname2', phone='01000000001',
                    pswd=get_random_pswd)
     return user_2
+
+
+@pytest.fixture
+def post_body_verify_phone_to_regist_user():
+    body = {
+        "username": "test_user_name",
+        "phone": "01011112222"
+    }
+    return body

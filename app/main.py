@@ -3,8 +3,6 @@ import sys
 import uvicorn
 from fastapi import Depends, FastAPI
 
-from app.utils.logger import logging
-
 if 'fastapi_users' not in [p.split('/')[-1] for p in sys.path]:
     from common import consts
 

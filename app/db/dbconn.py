@@ -21,9 +21,6 @@ class Engine:
         if self.env == 'test':
             self.database_url = "postgresql+asyncpg://"
 
-        logger.info("=====================================")
-        logger.info(self.database_url)
-        logger.info("=====================================")
         self._engine = create_async_engine(
             self.database_url,
             echo=True,
