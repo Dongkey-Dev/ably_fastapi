@@ -17,7 +17,7 @@ def create_app(env='dev'):
     db.init_app(app, env)
 
     app.include_router(ping.router, tags=[
-                       "heart_check"], prefix="/api/ping", dependencies=[Depends(logging_dependency)])
+                       "heart_check"], dependencies=[Depends(logging_dependency)])
     app.include_router(auth.router, tags=[
                        "Authentication"], prefix="/api", dependencies=[Depends(logging_dependency)])
     app.include_router(inquire.router, tags=[
