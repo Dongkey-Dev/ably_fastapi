@@ -2,7 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,macos,visualstudiocode,virtualenv,dotenv
 
 ### dotenv ###
-.env
+.env_prod
 *.ipynb
 ### macOS ###
 # General
