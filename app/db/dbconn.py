@@ -19,7 +19,7 @@ class Engine:
         self.database_url = "postgresql+asyncpg://{}:{}@{}:{}/{}".format(
             *get_db_env())
         if self.env == 'test':
-            self.database_url = "postgresql+asyncpg://"
+            self.database_url = "postgresql+asyncpg://@127.0.0.1:5432"
 
         self._engine = create_async_engine(
             self.database_url,
