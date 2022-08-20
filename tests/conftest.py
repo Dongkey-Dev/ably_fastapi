@@ -71,9 +71,8 @@ async def session(engine, create):
 
 
 @pytest_asyncio.fixture
-async def async_app_client(ENV) -> AsyncClient:
-    async with AsyncClient(app=create_app(env=ENV), base_url="http://127.0.0.1:5432") as client:
-
+async def async_app_client(session, ENV) -> AsyncClient:
+    async with AsyncClient(app=create_app(env=ENV), base_url="http://test") as client:
         yield client
 
 

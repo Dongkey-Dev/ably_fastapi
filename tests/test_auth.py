@@ -18,7 +18,7 @@ api_auth_login = "/api/auth/login"
 
 @pytest.mark.asyncio
 async def test_verify_phone_to_regist_user_1(
-        session, async_app_client,
+        async_app_client,
         post_body_verify_phone_to_regist_user_1):
     response = await async_app_client.post(url=api_auth_verify_phone_to_regist, json=post_body_verify_phone_to_regist_user_1)
     k, v = response.json().popitem()
@@ -34,7 +34,7 @@ async def test_verify_phone_to_regist_user_1(
 
 @pytest.mark.asyncio
 async def test_regist_user_1(
-        session, async_app_client,
+        async_app_client,
         post_body_verify_phone_to_regist_user_1,
         post_body_regist_user_1):
     response_jwt = await async_app_client.post(url=api_auth_verify_phone_to_regist, json=post_body_verify_phone_to_regist_user_1)
@@ -44,7 +44,7 @@ async def test_regist_user_1(
 
 @pytest.mark.asyncio
 async def test_verify_phone_to_reset_user_1(
-        logger, session, async_app_client,
+        session, async_app_client,
         post_body_verify_phone_to_regist_user_1,
         post_body_regist_user_1, user_class):
     response_jwt = await async_app_client.post(url=api_auth_verify_phone_to_regist, json=post_body_verify_phone_to_regist_user_1)
@@ -69,7 +69,7 @@ async def test_verify_phone_to_reset_user_1(
 
 @pytest.mark.asyncio
 async def test_login_user_1(
-        logger, session, user_1, async_app_client,
+        user_1, async_app_client,
         post_body_verify_phone_to_regist_user_1,
         post_body_regist_user_1,
         post_body_login_user_1):
@@ -85,7 +85,7 @@ async def test_login_user_1(
 
 @pytest.mark.asyncio
 async def test_reset_pswd_user_1(
-        logger, session, user_1, async_app_client,
+        session, user_1, async_app_client,
         post_body_verify_phone_to_regist_user_1,
         post_body_regist_user_1,
         post_body_reset_pswd_user_1, user_class):
