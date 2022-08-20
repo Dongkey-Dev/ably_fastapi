@@ -5,9 +5,9 @@ on:
     branches: [ "main" ]
 
 env:
-  DB_HOST: localhost
-  DB_USERNAME: postgres
-  DB_PASSWORD: postgres
+  POSTGRES_HOST: localhost
+  POSTGRES_USERNAME: postgres
+  POSTGRES_PASSWORD: postgres
 
 jobs:
   build:
