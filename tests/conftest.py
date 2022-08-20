@@ -46,7 +46,7 @@ def user_class() -> Users:
 @pytest_asyncio.fixture(scope="session")
 async def engine():
     engine = create_async_engine(
-        "postgresql+asyncpg://",
+        "postgresql+asyncpg://@127.0.0.1:5432",
         echo=True,
         pool_recycle=900,
         pool_pre_ping=True
