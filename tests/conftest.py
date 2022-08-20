@@ -130,3 +130,13 @@ def post_body_verify_phone_to_reset_user_1():
 def post_body_login_user_1(user_1):
     body = to_dict(user_1)
     return body
+
+
+@pytest.fixture
+def post_body_reset_pswd_user_1(user_1):
+    body = {
+        "email": user_1.email,
+        "pswd": "changed_pswd",
+        "confirm_pswd": "changed_pswd"
+    }
+    return body
