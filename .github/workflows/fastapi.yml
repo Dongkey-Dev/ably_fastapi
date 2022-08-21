@@ -13,24 +13,6 @@ jobs:
       matrix:
         python-version: [3.9]
 
-        #services:
-      #postgres:
-      #image: postgres:latest
-      # env:
-      #   POSTGRES_USER: postgres
-      #   POSTGRES_PASSWORD: postgres
-      #   POSTGRES_DB: postgres
-      # ports:
-      #   - 5432:5432
-      # options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
-        #env:
-        #POSTGRES_HOST: localhost
-        #POSTGRES_PORT: 5432
-      #POSTGRES_PASSWORD: posgres
-      #POSTGRES_USER: postgres
-      #POSTGRES_DB: postgres
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -55,4 +37,4 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        sudo pytest
+        pytest
