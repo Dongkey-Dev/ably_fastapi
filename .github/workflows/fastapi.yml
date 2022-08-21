@@ -17,8 +17,8 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_USER: ${{POSTGRESQL_DB_USER }}
-          POSTGRES_PASSWORD: ${{POSTGRESQL_DB_PSWD }}
+          POSTGRES_USER: ${POSTGRESQL_DB_USER }
+          POSTGRES_PASSWORD: ${POSTGRESQL_DB_PSWD }
           _DB: postgres
         ports:
           - 5432:5432
