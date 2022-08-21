@@ -15,8 +15,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Reclain cache directory
-      run: chown -R $USER /proc && echo "pwn dat cache"
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
