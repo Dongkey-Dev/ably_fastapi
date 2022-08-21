@@ -78,7 +78,7 @@ class ValidPhoneIn(BaseModel):
     @root_validator
     def check_phone_number(cls, values):
         phone = values.get("phone")
-        if not bool(re.search("[0-1]{2}\d{8,9}", phone)):
+        if not bool(re.search(r"[0-1]{2}\d{8,9}", phone)):
             raise ValueError(
                 "Wrong phone number")
         return values
