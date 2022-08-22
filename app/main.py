@@ -8,7 +8,7 @@ if 'fastapi_users' not in [p.split('/')[-1] for p in sys.path]:
 
 from app.common import consts
 from app.db.dbconn import db
-from app.routes import auth, inquire, ping
+from app.routes import auth, ping, service
 from app.utils.logger import logging_dependency
 
 
@@ -20,7 +20,7 @@ def create_app(env='dev'):
                        "heart_check"], dependencies=[Depends(logging_dependency)])
     app.include_router(auth.router, tags=[
                        "Authentication"], prefix="/api", dependencies=[Depends(logging_dependency)])
-    app.include_router(inquire.router, tags=[
+    app.include_router(service.router, tags=[
                        "Service"], prefix="/api/service", dependencies=[Depends(logging_dependency)])
     return app
 

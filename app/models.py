@@ -111,7 +111,7 @@ class UserLoginIn(BaseModel):
     pswd: str
 
 
-class UserInquireOut(BaseModel):
+class UserServiceOut(BaseModel):
     email: EmailStr
     nickname: str
     username: str

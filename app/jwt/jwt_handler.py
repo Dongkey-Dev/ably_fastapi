@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 from app.common.consts import JWT_ALGORITHM, JWT_SECRET
 from app.db.schema import Users
-from app.models import (UserInquireOut, UserPhonePswdToken, UserPhoneToken,
+from app.models import (UserPhonePswdToken, UserPhoneToken, UserServiceOut,
                         UserToken)
 from app.utils.query_utils import to_dict
 from fastapi import Depends, HTTPException, Request, status
@@ -84,7 +84,7 @@ async def get_user_token(payload: dict = Depends(valid_token)):
     if user is None:
         raise credentials_exception
     user_dict = to_dict(user)
-    user_out = UserInquireOut(**user_dict)
+    user_out = UserServiceOut(**user_dict)
     return user_out
 
 
